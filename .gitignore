@@ -1,0 +1,8 @@
+# generated files
+
+*.s
+*.actual
+*.expected
+*.gcc
+*.my
+*.err
