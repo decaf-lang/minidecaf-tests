@@ -1,7 +1,7 @@
 #!/bin/bash
 export CC="riscv64-unknown-elf-gcc -Dint=long"
 export QEMU=qemu-riscv64
-JOBS=(examples/step{1,2,3,4,5,6,7,8,9,10,11,12}/*.c)
+JOBS=(testcases/step{1,2,3,4,5,6,7,8,9,10,11,12}/*.c)
 
 
 gen_asm() {
@@ -35,11 +35,7 @@ run_job() {
     ) >$outbase.err 2>&1
     if [[ $? != 0 ]]; then
         echo "ERR ${infile}"
-        if [[ `cat $outbase.err` = "error: gen_asm undefined" ]]; then
-            return 3
-        else
-            return 2
-        fi
+        return 2
     fi
     $QEMU $outbase.my
     echo $? > $outbase.actual
