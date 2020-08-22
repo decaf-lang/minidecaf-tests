@@ -8,10 +8,10 @@ gen_asm() {
     cfile=$1
     asmfile=$2
 
-    # 如果是 python 参考代码，下面反注释
+    # 如果是 Python-ANTLR 参考代码，下面反注释
     # PYTHONPATH=../minidecaf python -m minidecaf $cfile $asmfile
 
-    # 如果是 rust 参考代码，下面反注释
+    # 如果是 Rust-lalr1 参考代码，下面反注释
     # ../minidecaf/target/debug/minidecaf $cfile > $asmfile
 
     # 你自己写的编译器，仿照上面自行添加命令
