@@ -1,6 +1,6 @@
 #!/bin/bash
-export CC="riscv64-unknown-elf-gcc -Dint=long"
-export QEMU=qemu-riscv64
+export CC="riscv64-unknown-elf-gcc  -march=rv32imac -mabi=ilp32 "
+export QEMU=qemu-riscv32
 JOBS=(testcases/step{1,2,3,4,5,6,7,8,9,10,11,12}/*.c)
 
 
