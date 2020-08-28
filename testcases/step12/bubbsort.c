@@ -1,5 +1,5 @@
 int rand(int *state) {
-    return *state = *state * 9312981 + 19431282132137;
+    return *state = *state * 9312967 + 282132157;
 }
 
 int swap(int *a, int *b) {
@@ -14,8 +14,8 @@ int inc(int *sorted_before) {
 int bubblesort(int sorted_after, int *a) {
     for (int i =0 ; i < sorted_after; inc(&i))
         for (int j =i+1;j<sorted_after; inc(&j))
-            if (a[i]  > a[j])
-                swap(a+i, a+j);
+            if (*(a + i)  > a[j])
+                swap(&a[i], a + j);
 }
 
 int sorted_after=500;

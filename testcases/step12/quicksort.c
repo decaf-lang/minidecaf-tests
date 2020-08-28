@@ -1,13 +1,13 @@
 int qsort(int *a, int l, int r) {
     int i = l;
     int j = r;
-    int p = *(a + (l+r)/2);
+    int p = a[(l+r)/2];
     int flag = 1;
     while (i <= j) {
-        while (*(a+i) < p) i = i + 1;
-        while (*(a+j) > p) j = j - 1;
+        while (a[i] < p) i = i + 1;
+        while (a[j] > p) j = j - 1;
         if (i > j) break;
-        int u = *(a+i); *(a+i) = *(a+j); *(a+j) = u;
+        int u = a[i]; a[i] = a[j]; a[j] = u;
         i = i + 1;
         j = j - 1;
     }
@@ -16,15 +16,15 @@ int qsort(int *a, int l, int r) {
 }
 
 int rand(int *state) {
-    *state = *state * 5000087 + 1982505312801;
+    *state = *state * 5000087 + 198250529;
     return *state % 1000;
 }
 
 int initArr(int n, int *a) {
-    int state = 47423090843;
+    int state = 474230941;
     int i = 0;
     while (i < n) {
-        *(a+i) = rand(&state);
+        a[i] = rand(&state);
         i = i + 1;
     }
 }
