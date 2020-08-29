@@ -15,6 +15,16 @@ int main() {
     }
     int **cb = (int**)b;
     int **c[10];
+
+    k = 0;
+    while (k<10) {
+        for (int i=0; i+k<10; i=i+1) {
+            if (cb[k][i] != k + i)
+                return 100 + k*10 + i;
+        }
+        k=k+1;
+    }
+
     k=0;
     while (k<10) {
         c[k]=cb;
