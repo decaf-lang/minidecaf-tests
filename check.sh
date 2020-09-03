@@ -1,6 +1,7 @@
 #!/bin/bash
-export CC="riscv64-unknown-elf-gcc  -march=rv32imac -mabi=ilp32 "
+export CC="riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
+USE_PARALLEL=${true:-$USE_PARALLEL}
 JOBS=(testcases/step{1,2,3,4,5,6,7,8,9,10,11,12}/*.c)
 
 
@@ -15,6 +16,8 @@ gen_asm() {
     # ../minidecaf/target/debug/minidecaf $cfile > $asmfile
 
     # 你自己写的编译器，仿照上面自行添加命令
+
+    echo "======== No compiler set! Check gen_asm! ========"
 }
 export -f gen_asm
 
@@ -67,8 +70,13 @@ check_env_and_parallel() {
     fi
 
     if parallel --version >/dev/null 2>&1; then
-        echo "parallel found"
-        return 0
+        if $USE_PARALLEL; then
+            echo "parallel found"
+            return 0
+        else
+            echo "parallel found but not used"
+            return 1
+        fi
     else
         echo "parallel not found"
         return 1
@@ -82,9 +90,9 @@ if ! [[ -d ../minidecaf ]]; then
 fi
 
 if check_env_and_parallel; then
-    parallel run_job ::: ${JOBS[@]}
+    parallel --halt now,fail=1 run_job ::: ${JOBS[@]}
 else
     for job in ${JOBS[@]}; do
-        run_job $job
+        if ! run_job $job; then break; fi
     done
 fi
