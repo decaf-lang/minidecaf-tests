@@ -3,6 +3,7 @@ export CC="riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
 USE_PARALLEL=${true:-$USE_PARALLEL}
 JOBS=(testcases/step{1,2,3,4,5,6,7,8,9,10,11,12}/*.c)
+FAILJOBS=(failcases/step1/*.c)
 
 
 gen_asm() {
@@ -10,10 +11,10 @@ gen_asm() {
     asmfile=$2
 
     # 如果是 Python-ANTLR 参考代码，下面反注释
-    # PYTHONPATH=../minidecaf python -m minidecaf $cfile $asmfile
+    # PYTHONPATH=../minidecaf python -m minidecaf $cfile >$asmfile
 
     # 如果是 Rust-lalr1 参考代码，下面反注释
-    # ../minidecaf/target/debug/minidecaf $cfile > $asmfile
+    # ../minidecaf/target/debug/minidecaf $cfile >$asmfile
 
     # 你自己写的编译器，仿照上面自行添加命令
 
@@ -54,6 +55,24 @@ run_job() {
 export -f run_job
 
 
+run_failjob() {
+    infile=$1
+    outbase=${infile%.c}
+
+    if ( set -e
+      gen_asm $infile $outbase.s
+      $CC $outbase.s -o $outbase.my ) >/dev/null 2>&1
+    then
+        echo "FAIL ${infile}"
+        return 1
+    else
+        echo "OK ${infile}"
+        return 0
+    fi
+}
+export -f run_failjob
+
+
 check_env_and_parallel() {
     if $CC --version >/dev/null 2>&1; then
         echo "gcc found"
@@ -91,8 +110,12 @@ fi
 
 if check_env_and_parallel; then
     parallel --halt now,fail=1 run_job ::: ${JOBS[@]}
+    parallel --halt now,fail=1 run_failjob ::: ${FAILJOBS[@]}
 else
     for job in ${JOBS[@]}; do
         if ! run_job $job; then break; fi
+    done
+    for job in ${FAILJOBS[@]}; do
+        run_failjob $job
     done
 fi
