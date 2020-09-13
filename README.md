@@ -19,7 +19,7 @@ parallel 版本没有什么要求，apt install 的就行。
 * `*.err`：`ERR` 的错误信息
 * `*.expected`：用 gcc 编译运行得到的标准答案
 * `*.actual`：运行你的编译结果得到的答案，需要和上面一样
-- `*.{gcc,my}`：可执行文件
+* `*.{gcc,my}`：可执行文件
 
 ## 常见问题
 * permission denied: ./check.sh
@@ -29,5 +29,5 @@ parallel 版本没有什么要求，apt install 的就行。
     如果你没有安装到系统目录（即 `cp riscv-prebuilt/* /usr/ -r`），你还要设置环境变量。
 
 ## 参考
-- [Nora Sandler's compiler testsuits](https://github.com/nlsandler/write_a_c_compiler)
+* [Nora Sandler's compiler testsuits](https://github.com/nlsandler/write_a_c_compiler)
 
