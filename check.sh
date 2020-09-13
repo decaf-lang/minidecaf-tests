@@ -2,8 +2,8 @@
 export CC="riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
 USE_PARALLEL=${true:-$USE_PARALLEL}
-JOBS=(testcases/step{1,2,3,4,5,6,7,8,9,10,11,12}/*.c)
-FAILJOBS=(failcases/step1/*.c)
+JOBS=(`find testcases -name '*.c'`)
+FAILJOBS=(`find failcases -name '*.c'`)
 
 
 gen_asm() {
