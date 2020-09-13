@@ -12,13 +12,17 @@ gen_asm() {
 
     # 如果是 Python-ANTLR 参考代码，下面反注释
     # PYTHONPATH=../minidecaf python -m minidecaf $cfile >$asmfile
+    # return 0
 
     # 如果是 Rust-lalr1 参考代码，下面反注释
     # ../minidecaf/target/debug/minidecaf $cfile >$asmfile
+    # return 0
 
     # 你自己写的编译器，仿照上面自行添加命令
 
+    # 不要动以下内容
     echo "======== No compiler set! Check gen_asm! ========"
+    touch no_compiler_set
 }
 export -f gen_asm
 
@@ -103,19 +107,30 @@ check_env_and_parallel() {
 }
 
 
+main() {
+    if check_env_and_parallel; then
+        parallel --halt now,fail=1 run_job ::: ${JOBS[@]}
+        parallel --halt now,fail=1 run_failjob ::: ${FAILJOBS[@]}
+    else
+        for job in ${JOBS[@]}; do
+            if ! run_job $job; then exit 1; fi
+        done
+        for job in ${FAILJOBS[@]}; do
+            if ! run_failjob $job; then exit 1; fi
+        done
+    fi
+}
+
+
 if ! [[ -d ../minidecaf ]]; then
     echo "Put your code in ../minidecaf"
     exit 1
 fi
 
-if check_env_and_parallel; then
-    parallel --halt now,fail=1 run_job ::: ${JOBS[@]}
-    parallel --halt now,fail=1 run_failjob ::: ${FAILJOBS[@]}
-else
-    for job in ${JOBS[@]}; do
-        if ! run_job $job; then break; fi
-    done
-    for job in ${FAILJOBS[@]}; do
-        run_failjob $job
-    done
+if ! (main); then
+    [[ -f no_compiler_set ]] && { echo "Change gen_asm first!" ; rm no_compiler_set; }
+    echo FAILED
+    exit 1;
 fi
+
+echo PASSED

@@ -6,3 +6,4 @@
 *.gcc
 *.my
 *.err
+no_compiler_set
