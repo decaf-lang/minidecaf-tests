@@ -109,8 +109,8 @@ check_env_and_parallel() {
 
 main() {
     if check_env_and_parallel; then
-        parallel --halt now,fail=1 run_job ::: ${JOBS[@]}
-        parallel --halt now,fail=1 run_failjob ::: ${FAILJOBS[@]}
+        parallel --halt now,fail=1 run_job ::: ${JOBS[@]} || exit 1
+        parallel --halt now,fail=1 run_failjob ::: ${FAILJOBS[@]} || exit 1
     else
         for job in ${JOBS[@]}; do
             if ! run_job $job; then exit 1; fi
