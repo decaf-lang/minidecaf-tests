@@ -1,6 +1,7 @@
 #!/bin/bash
 export CC="riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
+
 USE_PARALLEL=${true:-$USE_PARALLEL}
 JOBS=(`find testcases -name '*.c'`)
 FAILJOBS=(`find failcases -name '*.c'`)
@@ -10,19 +11,14 @@ gen_asm() {
     cfile=$1
     asmfile=$2
 
-    # 如果是 Python-ANTLR 参考代码，下面反注释
-    # PYTHONPATH=../minidecaf python -m minidecaf $cfile >$asmfile
-    # return 0
-
-    # 如果是 Rust-lalr1 参考代码，下面反注释
-    # ../minidecaf/target/debug/minidecaf $cfile >$asmfile
-    # return 0
-
-    # 你自己写的编译器，仿照上面自行添加命令
-
-    # 不要动以下内容
-    echo "======== No compiler set! Check gen_asm! ========"
-    touch no_compiler_set
+    if [[ -f ../minidecaf/minidecaf/requirements.txt ]]; then       # Python
+        PYTHONPATH=../minidecaf python -m minidecaf $cfile >$asmfile
+    elif [[ -f ../minidecaf/Cargo.toml ]]; then                     # Rust
+        ../minidecaf/target/debug/minidecaf $cfile >$asmfile
+    else
+        echo "======== No compiler set! Check gen_asm! ========"
+        touch no_compiler_set
+    fi
 }
 export -f gen_asm
 
