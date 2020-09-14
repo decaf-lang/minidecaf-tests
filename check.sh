@@ -1,6 +1,12 @@
 #!/bin/bash
 export CC="riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
+export SPIKE="spike --isa=RV32G /usr/local/bin/pk"
+if [ $(uname) = "Linux" ]; then
+    export EMU=$QEMU
+else
+    export EMU=$SPIKE
+fi
 
 : ${USE_PARALLEL:=true}
 : ${STEP_UNTIL:=12}
@@ -11,13 +17,15 @@ JOBS=($(eval echo testcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]
 FAILJOBS=($(eval echo failcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
 
 gen_asm() {
-    cfile=$1
-    asmfile=$2
+    cfile=$(realpath "$1")
+    asmfile=$(realpath "$2")
 
     if [[ -f $PROJ_PATH/minidecaf/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
         PYTHONPATH=$PROJ_PATH python -m minidecaf $cfile >$asmfile
     elif [[ -f $PROJ_PATH/Cargo.toml ]]; then                     # Rust:   Cargo.toml
         cargo run --manifest-path $PROJ_PATH/Cargo.toml $cfile >$asmfile
+    elif [[ -f $PROJ_PATH/package.json ]]; then                   # JS/TS:  package.json
+        npm --prefix "$PROJ_PATH" run cli -- "$cfile" -s -o "$asmfile"
     else
         touch unrecog_impl
     fi
@@ -32,7 +40,7 @@ run_job() {
     rm $outbase.{gcc,expected,err,my,actual,s} 1>/dev/null 2>&1
 
     $CC $infile -o $outbase.gcc
-    $QEMU $outbase.gcc
+    $EMU $outbase.gcc >/dev/null
     echo $? > $outbase.expected
 
     ( set -e
@@ -43,7 +51,7 @@ run_job() {
         echo "ERR ${infile}"
         return 2
     fi
-    $QEMU $outbase.my
+    $EMU $outbase.my >/dev/null
     echo $? > $outbase.actual
 
     if ! diff -q $outbase.expected $outbase.actual >/dev/null ; then
@@ -60,6 +68,8 @@ export -f run_job
 run_failjob() {
     infile=$1
     outbase=${infile%.c}
+
+    rm $outbase.{my,s} 1>/dev/null 2>&1
 
     if ( set -e
       gen_asm $infile $outbase.s
@@ -83,11 +93,20 @@ check_env_and_parallel() {
         exit 1
     fi
 
-    if $QEMU -version >/dev/null 2>&1; then
-        echo "qemu found"
+    if [ $(uname) = "Linux" ]; then
+        if $QEMU -version >/dev/null 2>&1; then
+            echo "qemu found"
+        else
+            echo "qemu not found"
+            exit 1
+        fi
     else
-        echo "qemu not found"
-        exit 1
+        if $SPIKE -h >/dev/null 2>&1; then
+            echo "spike/pk found"
+        else
+            echo "spike/pk not found"
+            exit 1
+        fi
     fi
 
     if parallel --version >/dev/null 2>&1; then
