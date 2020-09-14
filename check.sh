@@ -13,8 +13,13 @@ fi
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
 
-JOBS=($(eval echo testcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
-FAILJOBS=($(eval echo failcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
+if [[ $STEP_UNTIL == 1 ]]; then # fvck bash cause ya can't do `testcases/step{1}/*.c`
+    JOBS=($(eval echo testcases/step1/*.c))
+    FAILJOBS=($(eval echo failcases/step1/*.c))
+else
+    JOBS=($(eval echo testcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
+    FAILJOBS=($(eval echo failcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
+fi
 
 gen_asm() {
     cfile=$(realpath "$1")

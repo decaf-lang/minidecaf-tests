@@ -9,6 +9,11 @@ parallel 版本没有什么要求，apt install 的就行。
 修改 `check.sh` 中的 `gen_asm` 函数，加入运行你编译器的命令。
 然后直接 `./check.sh` 即可。
 
+如果只想跑到 step3，那么运行 `STEP_UNTIL=3 ./check.sh` 即可。
+注意 `STEP_UNTIL` 只能是 1 到 12 的整数。
+
+默认 minidecaf 仓库放在 `../minidecaf`，如果不是这样，可以改 `PROJ_PATH`，例如 `PROJ_PATH=.. STEP_UNTIL=1 ./check.sh`。
+
 ## 输出含义
 * `OK` 测试点通过
 * `ERR` 你的编译器崩了，或者输出的汇编格式不对
