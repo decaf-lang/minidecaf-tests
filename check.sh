@@ -7,8 +7,8 @@ export QEMU=qemu-riscv32
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
 
-JOBS=($(eval echo testcases/step{$(seq -s, $STEP_UNTIL)}/*.c))
-FAILJOBS=($(eval echo failcases/step{$(seq -s, $STEP_UNTIL)}/*.c))
+JOBS=($(eval echo testcases/step{$(s=(`seq 12`); IFS=, ; echo "${s[*]}")}/*.c))
+FAILJOBS=($(eval echo failcases/step{$(s=(`seq 12`); IFS=, ; echo "${s[*]}")}/*.c))
 
 gen_asm() {
     cfile=$1
