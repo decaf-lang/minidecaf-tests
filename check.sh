@@ -125,7 +125,7 @@ if ! [[ -d $PROJ_PATH ]]; then
 fi
 
 if ! (main); then
-    [[ -f unrecog_impl ]] && { echo "Unrecognized implementation. Are you using one of the supported language & frameworks?" ; rm unrecog_impl; }
+    [[ -f unrecog_impl ]] && { echo "Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place?" ; rm unrecog_impl; }
     echo FAILED
     exit 1;
 fi
