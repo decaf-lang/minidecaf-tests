@@ -46,7 +46,7 @@ run_job() {
     $QEMU $outbase.my
     echo $? > $outbase.actual
 
-    if ! diff -qZ $outbase.expected $outbase.actual >/dev/null ; then
+    if ! diff -q $outbase.expected $outbase.actual >/dev/null ; then
         echo "FAIL ${infile}"
         return 1
     else
