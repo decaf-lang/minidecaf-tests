@@ -3,11 +3,12 @@ export CC="riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
 
 : ${USE_PARALLEL:=true}
+: ${STEP_UNTIL:=12}
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
-JOBS=(`find testcases -name '*.c'`)
-FAILJOBS=(`find failcases -name '*.c'`)
 
+JOBS=($(eval echo testcases/step{$(seq -s, $STEP_UNTIL)}/*.c))
+FAILJOBS=($(eval echo failcases/step{$(seq -s, $STEP_UNTIL)}/*.c))
 
 gen_asm() {
     cfile=$1
