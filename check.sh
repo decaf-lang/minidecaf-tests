@@ -16,7 +16,7 @@ gen_asm() {
     if [[ -f $PROJ_PATH/minidecaf/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
         PYTHONPATH=$PROJ_PATH python -m minidecaf $cfile >$asmfile
     elif [[ -f $PROJ_PATH/Cargo.toml ]]; then                     # Rust:   Cargo.toml
-        $PROJ_PATH/target/debug/minidecaf $cfile >$asmfile
+        cargo run --manifest-path $PROJ_PATH/Cargo.toml $cfile >$asmfile
     else
         touch unrecog_impl
     fi
