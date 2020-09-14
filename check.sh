@@ -2,7 +2,9 @@
 export CC="riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
 
-USE_PARALLEL=${true:-$USE_PARALLEL}
+: ${USE_PARALLEL:=true}
+: ${PROJ_PATH:=../minidecaf}
+export PROJ_PATH
 JOBS=(`find testcases -name '*.c'`)
 FAILJOBS=(`find failcases -name '*.c'`)
 
@@ -11,13 +13,12 @@ gen_asm() {
     cfile=$1
     asmfile=$2
 
-    if [[ -f ../minidecaf/minidecaf/requirements.txt ]]; then       # Python
-        PYTHONPATH=../minidecaf python -m minidecaf $cfile >$asmfile
-    elif [[ -f ../minidecaf/Cargo.toml ]]; then                     # Rust
-        ../minidecaf/target/debug/minidecaf $cfile >$asmfile
+    if [[ -f $PROJ_PATH/minidecaf/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
+        PYTHONPATH=$PROJ_PATH python -m minidecaf $cfile >$asmfile
+    elif [[ -f $PROJ_PATH/Cargo.toml ]]; then                     # Rust:   Cargo.toml
+        $PROJ_PATH/target/debug/minidecaf $cfile >$asmfile
     else
-        echo "======== No compiler set! Check gen_asm! ========"
-        touch no_compiler_set
+        touch unrecog_impl
     fi
 }
 export -f gen_asm
@@ -118,13 +119,13 @@ main() {
 }
 
 
-if ! [[ -d ../minidecaf ]]; then
-    echo "Put your code in ../minidecaf"
+if ! [[ -d $PROJ_PATH ]]; then
+    echo "Put your code in $PROJ_PATH"
     exit 1
 fi
 
 if ! (main); then
-    [[ -f no_compiler_set ]] && { echo "Change gen_asm first!" ; rm no_compiler_set; }
+    [[ -f unrecog_impl ]] && { echo "Unrecognized implementation. Are you using one of the supported language & frameworks?" ; rm unrecog_impl; }
     echo FAILED
     exit 1;
 fi
