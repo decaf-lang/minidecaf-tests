@@ -9,7 +9,7 @@ else
 fi
 
 : ${USE_PARALLEL:=true}
-: ${STEP_UNTIL:=1}
+: ${STEP_UNTIL:=12}
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
 
@@ -25,6 +25,7 @@ gen_asm() {
     cfile=$(realpath "$1")
     asmfile=$(realpath "$2")
 
+    # 根据特征文件判断 minidecaf 类型
     if [[ -f $PROJ_PATH/minidecaf/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
         PYTHONPATH=$PROJ_PATH python -m minidecaf $cfile >$asmfile
     elif [[ -f $PROJ_PATH/Cargo.toml ]]; then                     # Rust:   Cargo.toml

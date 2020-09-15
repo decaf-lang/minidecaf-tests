@@ -2,23 +2,27 @@
 MiniDecaf 测例及测试脚本。
 
 我们有两种测例
-- 普通测例（在`testcases/`下）：你需要成功编译这些测例，并且我们会将你的编译结果的运行返回值与 GCC 编译结果的运行返回值比较，要求它们必须要完全相同；
-- 报错测例（在`failcases/`下）：这是一些不应该被成功变异的测例，对于它们你需要报错。
+- 普通测例（在 `testcases/` 下）：你的 MiniDecaf 要能成功编译这些测例到合法的汇编。
+  我们会将你的编译结果的运行返回值与 GCC 编译结果的运行返回值比较，要求它们必须要完全相同；
+- 报错测例（在 `failcases/` 下）：你的 MiniDecaf 对于这些测例不得生成合法汇编（最好能够生成有用的报错信息）。
 
 ## 依赖
-- [GNU parallel](https://www.gnu.org/software/parallel/)
 - [RISCV工具链](https://decaf-lang.github.io/minidecaf-tutorial-deploy/docs/lab0/riscv.html)
+- （可选）[GNU parallel](https://www.gnu.org/software/parallel/)，用于并行测试，对于多核机器可大幅提高测试速度（3-5 倍）。
 
 ## 用法
-修改 `check.sh` 中的 `gen_asm` 函数，加入运行你编译器的命令。
-然后运行 `check.sh` 即可。
+直接运行 `check.sh` 即可，例如在 `minidecaf-tests/` 目录下
+```
+$ ./check.sh
+```
 
-如果只想跑到 step3，那么运行 `STEP_UNTIL=3 ./check.sh` 即可。
-注意 `STEP_UNTIL` 只能是 1 到 12 的整数。
+`check.sh` 支持如下参数，参数用法是 `OPT=VALUE ./check.sh`，多个 `OPT`-`VALUE` 对用空格隔开。
+例如 `STEP_UNTIL=1 PROJ_PATH=../minidecaf ./check.sh`。
 
-默认 minidecaf 仓库放在 `../minidecaf`，如果不是这样，可以改 `PROJ_PATH`，例如 `PROJ_PATH=.. STEP_UNTIL=1 ./check.sh`。
-
-> 注意：ANTLR 遇到语法错误时不会异常退出，为了方便测试，我们需要将 ANLTR 的 error handler 改为 [BailErrorStrategy](https://www.antlr.org/api/Java/org/antlr/v4/runtime/BailErrorStrategy.html)，具体改动方式可见于参考代码。
+| 参数名 | 类型 | 含义 | 默认值 |
+| --- | --- | --- | --- |
+| `STEP_UNTIL` | 1 到 12 的整数 | 测到哪个 step | 12 |
+| `PROJ_PATH` | 一个相对路径 | 你的 minidecaf 相对 minidecaf-tests 的相对路径 | `../minidecaf` |
 
 ## 输出含义
 * `OK` 测试点通过
@@ -33,11 +37,17 @@ MiniDecaf 测例及测试脚本。
 * `*.{gcc,my}`：可执行文件
 
 ## 常见问题
+* 我做完 step1 为啥不能通过测试？
+  - `STEP_UNTIL=1 ./check.sh`
 * permission denied: ./check.sh
   - 需要给 `check.sh` 加执行权限 `chmod +x check.sh`
 * gcc not found 或 qemu not found
   - 请按照[实验指导书](https://decaf-lang.github.io/minidecaf-tutorial/docs/lab0/env.html)配好环境。
     如果你没有安装到系统目录（即 `cp riscv-prebuilt/* /usr/ -r`），你还要设置环境变量。
+* Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place
+  - 你是否使用我们支持的语言？如果是，目录结构是否有问题？
+* 明明 failcases 的输入有语法错误，为什么我还是生成了汇编？
+  - 你是否按照指导书要求，设置了 ANTLR 的 error handler？
 
 ## 参考
 * [Nora Sandler's compiler testsuits](https://github.com/nlsandler/write_a_c_compiler)
