@@ -9,7 +9,7 @@ else
 fi
 
 : ${USE_PARALLEL:=true}
-: ${STEP_UNTIL:=12}
+: ${STEP_UNTIL:=1}
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
 
@@ -145,6 +145,7 @@ main() {
     fi
 }
 
+cd "$(dirname "$0")"
 
 if ! [[ -d $PROJ_PATH ]]; then
     echo "Put your code in $PROJ_PATH"
