@@ -1,18 +1,24 @@
 # minidecaf-tests
-MiniDecaf 测例。
+MiniDecaf 测例及测试脚本。
 
-推荐安装[GNU parallel](https://www.gnu.org/software/parallel/)以支持并行测试，
-并行测试比串行测试快三至五倍。
-parallel 版本没有什么要求，apt install 的就行。
+我们有两种测例
+- 普通测例（在`testcases/`下）：你需要成功编译这些测例，并且我们会将你的编译结果的运行返回值与 GCC 编译结果的运行返回值比较，要求它们必须要完全相同；
+- 报错测例（在`failcases/`下）：这是一些不应该被成功变异的测例，对于它们你需要报错。
+
+## 依赖
+- [GNU parallel](https://www.gnu.org/software/parallel/)
+- [RISCV工具链](https://decaf-lang.github.io/minidecaf-tutorial-deploy/docs/lab0/riscv.html)
 
 ## 用法
 修改 `check.sh` 中的 `gen_asm` 函数，加入运行你编译器的命令。
-然后直接 `./check.sh` 即可。
+然后运行 `check.sh` 即可。
 
 如果只想跑到 step3，那么运行 `STEP_UNTIL=3 ./check.sh` 即可。
 注意 `STEP_UNTIL` 只能是 1 到 12 的整数。
 
 默认 minidecaf 仓库放在 `../minidecaf`，如果不是这样，可以改 `PROJ_PATH`，例如 `PROJ_PATH=.. STEP_UNTIL=1 ./check.sh`。
+
+> 注意：ANTLR 遇到语法错误时不会异常退出，为了方便测试，我们需要将 ANLTR 的 error handler 改为 [BailErrorStrategy](https://www.antlr.org/api/Java/org/antlr/v4/runtime/BailErrorStrategy.html)，具体改动方式可见于参考代码。
 
 ## 输出含义
 * `OK` 测试点通过
@@ -35,4 +41,3 @@ parallel 版本没有什么要求，apt install 的就行。
 
 ## 参考
 * [Nora Sandler's compiler testsuits](https://github.com/nlsandler/write_a_c_compiler)
-
