@@ -31,6 +31,8 @@ gen_asm() {
         cargo run --manifest-path $PROJ_PATH/Cargo.toml $cfile >$asmfile
     elif [[ -f $PROJ_PATH/package.json ]]; then                   # JS/TS:  package.json
         npm --prefix "$PROJ_PATH" run cli -- "$cfile" -s -o "$asmfile"
+    elif [[ -f $PROJ_PATH/gradlew ]]; then                        # Java:   gradlew
+        java -ea -jar $PROJ_PATH/build/libs/minidecaf.jar $cfile $asmfile
     else
         touch unrecog_impl
     fi
