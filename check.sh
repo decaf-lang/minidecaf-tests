@@ -27,7 +27,7 @@ gen_asm() {
 
     # 根据特征文件判断 minidecaf 类型
     if [[ -f $PROJ_PATH/minidecaf/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
-        PYTHONPATH=$PROJ_PATH python -m minidecaf $cfile >$asmfile
+        PYTHONPATH=$PROJ_PATH python3 -m minidecaf $cfile >$asmfile
     elif [[ -f $PROJ_PATH/Cargo.toml ]]; then                     # Rust:   Cargo.toml
         cargo run --manifest-path $PROJ_PATH/Cargo.toml $cfile >$asmfile
     elif [[ -f $PROJ_PATH/package.json ]]; then                   # JS/TS:  package.json
