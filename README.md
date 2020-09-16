@@ -37,6 +37,12 @@ $ ./check.sh
 * `*.{gcc,my}`：可执行文件
 
 ## 常见问题
+遇到问题，请先尝试重设仓库，删除临时文件，撤销所有你的改动：
+```
+$ git clean -fdx
+$ git checkout -- .
+```
+
 * 我做完 step1 为啥不能通过测试？
   - `STEP_UNTIL=1 ./check.sh`
 * permission denied: ./check.sh
