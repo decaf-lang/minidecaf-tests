@@ -53,7 +53,7 @@ $ git checkout -- .
 * parallel not found
   - 这意味着你没有安装[GNU parallel](https://www.gnu.org/software/parallel/)，可以通过`apt`或者`brew`等包管理软件来安装。需要注意的是，是否安装了它对测试结果的正确性没有任何影响，所以假如你看到了这条信息，并且测试没有通过，那么不用在它上面找原因。
 * Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place
-  - 你是否使用我们支持的语言？如果是，目录结构是否有问题？
+  - 你是否使用我们支持的语言？如果是，目录结构是否有问题？参见下面【各语言支持】
 * 明明 failcases 的输入有语法错误，为什么我还是生成了汇编？
   - 你是否按照指导书要求，设置了 ANTLR 的 error handler？
 * macOS 下找不到 realpath 命令
@@ -63,6 +63,20 @@ $ git checkout -- .
   ./check.sh: line 30: $asmfile: ambiguous redirect
   ```
   - 使用 Homebrew 安装 coreutils：`brew install coreutils`
+
+## 各语言支持
+为了通过自动测试，我们对你的编译器做以下约定。
+`PROJ_PATH` 含义同上。
+
+| 用于实现 MiniDecaf 编译器的语言 | 约定 |
+| --- | --- |
+| python | `PROJ_PATH/minidecaf` 是一个可执行模块（有 `PROJ_PATH/minidecaf/__main__.py` 和 `PROJ_PATH/minidecaf/requirements.txt`） |
+| rust | 使用 cargo 管理依赖，`PROJ_PATH/Cargo.toml` 存在 |
+| javascript | 使用 npm 管理依赖，`PROJ_PATH/package.json` 存在 |
+| java | 使用 gradle 管理依赖，`PROJ_PATH/gradlew` 存在 |
+| C/C++/其他 | 自行在仓库中和 `prepare.sh` 中管理依赖，要求执行 `prepare.sh` 后有 `PROJ_PATH/build/MiniDecaf` 可执行程序 |
+
+各语言用法参见 `check.sh` 中 `gen_asm` 函数。
 
 ## 参考
 * [Nora Sandler's compiler testsuits](https://github.com/nlsandler/write_a_c_compiler)
