@@ -34,12 +34,13 @@ gen_asm() {
         npm --prefix "$PROJ_PATH" run cli -- "$cfile" -s -o "$asmfile"
     elif [[ -f $PROJ_PATH/gradlew ]]; then                        # Java:   gradlew
         java -ea -jar $PROJ_PATH/build/libs/minidecaf.jar $cfile $asmfile
-    elif [[ -f $PROJ_PATH/CMakeLists.txt ]]; then
-        mkdir build
+    elif [[ -f $PROJ_PATH/CMakeLists.txt ]]; then                 # C++:    CMake
+        mkdir -p build
         cd build
-        cmake ..
+        cmake $PROJ_PATH
         make
-        ./MiniDecaf $cfile >$asmfile
+        cd ..
+        ./build/MiniDecaf $cfile >$asmfile
     else
         touch unrecog_impl
     fi
@@ -63,6 +64,7 @@ run_job() {
     ) >$outbase.err 2>&1
     if [[ $? != 0 ]]; then
         echo "ERR ${infile}"
+        cat $outbase.err
         return 2
     fi
     $EMU $outbase.my >/dev/null
