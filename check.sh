@@ -13,7 +13,10 @@ fi
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
 
-if [[ $STEP_UNTIL == 1 ]]; then # fvck bash cause ya can't do `testcases/step{1}/*.c`
+if [[ $STEP_UNTIL == 0 ]]; then
+    echo "STEP_UNTIL=0: no tests run"
+    exit 0
+elif [[ $STEP_UNTIL == 1 ]]; then # fvck bash cause ya can't do `testcases/step{1}/*.c`
     JOBS=($(eval echo testcases/step1/*.c))
     FAILJOBS=($(eval echo failcases/step1/*.c))
 else
@@ -27,7 +30,7 @@ gen_asm() {
 
     # 根据特征文件判断 minidecaf 类型
     if [[ -f $PROJ_PATH/minidecaf/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
-        PYTHONPATH=$PROJ_PATH python -m minidecaf $cfile >$asmfile
+        PYTHONPATH=$PROJ_PATH python3 -m minidecaf $cfile >$asmfile
     elif [[ -f $PROJ_PATH/Cargo.toml ]]; then                     # Rust:   Cargo.toml
         cargo run --manifest-path $PROJ_PATH/Cargo.toml $cfile >$asmfile
     elif [[ -f $PROJ_PATH/package.json ]]; then                   # JS/TS:  package.json
@@ -42,7 +45,7 @@ gen_asm() {
         cd ..
         ./build/MiniDecaf $cfile >$asmfile
     else
-        touch unrecog_impl
+        touch _unrecog_impl
     fi
 }
 export -f gen_asm
@@ -58,20 +61,20 @@ run_job() {
     $EMU $outbase.gcc >/dev/null
     echo $? > $outbase.expected
 
-    ( set -e
-      gen_asm $infile $outbase.s
-      $CC $outbase.s -o $outbase.my
-    ) >$outbase.err 2>&1
-    if [[ $? != 0 ]]; then
-        echo "ERR ${infile}"
-        cat $outbase.err
+    if ! (
+        gen_asm $infile $outbase.s &&
+        $CC $outbase.s -o $outbase.my ) >$outbase.err 2>&1
+    then
+        echo "ERR ${infile}" | tee _cause
+        cat $outbase.err > _diagnostics
         return 2
     fi
     $EMU $outbase.my >/dev/null
     echo $? > $outbase.actual
 
     if ! diff -q $outbase.expected $outbase.actual >/dev/null ; then
-        echo "FAIL ${infile}"
+        echo "FAIL ${infile}" | tee _cause
+        diff $outbase.expected $outbase.actual > _diagnostics
         return 1
     else
         echo "OK ${infile}"
@@ -87,11 +90,12 @@ run_failjob() {
 
     rm $outbase.{my,s} 1>/dev/null 2>&1
 
-    if ( set -e
-      gen_asm $infile $outbase.s
-      $CC $outbase.s -o $outbase.my ) >/dev/null 2>&1
+    if (
+        gen_asm $infile $outbase.s &&
+        $CC $outbase.s -o $outbase.my ) >/dev/null 2>&1
     then
-        echo "FAIL ${infile}"
+        echo "FAIL ${infile}" | tee _cause
+        cat $outbase.s > _diagnostics
         return 1
     else
         echo "OK ${infile}"
@@ -145,12 +149,8 @@ main() {
         parallel --halt now,fail=1 run_job ::: ${JOBS[@]} || exit 1
         parallel --halt now,fail=1 run_failjob ::: ${FAILJOBS[@]} || exit 1
     else
-        for job in ${JOBS[@]}; do
-            if ! run_job $job; then exit 1; fi
-        done
-        for job in ${FAILJOBS[@]}; do
-            if ! run_failjob $job; then exit 1; fi
-        done
+        for job in ${JOBS[@]}; do run_job $job || exit 1; done
+        for job in ${FAILJOBS[@]}; do run_failjob $job || exit 1; done
     fi
 }
 
@@ -162,7 +162,24 @@ if ! [[ -d $PROJ_PATH ]]; then
 fi
 
 if ! (main); then
-    [[ -f unrecog_impl ]] && { echo "Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place?" ; rm unrecog_impl; }
+    if [[ -f _unrecog_impl ]]; then
+        echo "Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place?"
+        rm _unrecog_impl;
+    fi
+
+    if [[ -f _cause ]]; then
+        # only output diagnostics when parallel is disabled
+        # because with parallel running the _cause and _diagnostics
+        # is unprotected and a race could clutter their contents
+        if ! $USE_PARALLEL; then
+            echo ================ `cat _cause` failed
+            echo ================ Diagnostics information:
+            cat _diagnostics
+            echo ================ End diagnostics
+        fi
+        rm _cause _diagnostics
+    fi
+
     echo FAILED
     exit 1;
 fi

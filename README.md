@@ -37,6 +37,12 @@ $ ./check.sh
 * `*.{gcc,my}`：可执行文件
 
 ## 常见问题
+遇到问题，请先尝试重设仓库，删除临时文件，撤销所有你的改动：
+```
+$ git clean -fdx
+$ git checkout -- .
+```
+
 * 我做完 step1 为啥不能通过测试？
   - `STEP_UNTIL=1 ./check.sh`
 * permission denied: ./check.sh
@@ -50,6 +56,13 @@ $ ./check.sh
   - 你是否使用我们支持的语言？如果是，目录结构是否有问题？
 * 明明 failcases 的输入有语法错误，为什么我还是生成了汇编？
   - 你是否按照指导书要求，设置了 ANTLR 的 error handler？
+* macOS 下找不到 realpath 命令
+  ```
+  ./check.sh: line 25: realpath: command not found
+  ./check.sh: line 26: realpath: command not found
+  ./check.sh: line 30: $asmfile: ambiguous redirect
+  ```
+  - 使用 Homebrew 安装 coreutils：`brew install coreutils`
 
 ## 参考
 * [Nora Sandler's compiler testsuits](https://github.com/nlsandler/write_a_c_compiler)
