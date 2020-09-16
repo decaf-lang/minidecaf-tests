@@ -38,12 +38,7 @@ gen_asm() {
     elif [[ -f $PROJ_PATH/gradlew ]]; then                        # Java:   gradlew
         java -ea -jar $PROJ_PATH/build/libs/minidecaf.jar $cfile $asmfile
     elif [[ -f $PROJ_PATH/CMakeLists.txt ]]; then                 # C++:    CMake
-        mkdir -p build
-        cd build
-        cmake $PROJ_PATH
-        make
-        cd ..
-        ./build/MiniDecaf $cfile >$asmfile
+        $PROJ_PATH/build/MiniDecaf $cfile >$asmfile
     else
         touch _unrecog_impl
     fi
