@@ -34,6 +34,12 @@ gen_asm() {
         npm --prefix "$PROJ_PATH" run cli -- "$cfile" -s -o "$asmfile"
     elif [[ -f $PROJ_PATH/gradlew ]]; then                        # Java:   gradlew
         java -ea -jar $PROJ_PATH/build/libs/minidecaf.jar $cfile $asmfile
+    elif [[ -f $PROJ_PATH/CMakeLists.txt ]]; then
+        mkdir build
+        cd build
+        cmake ..
+        make
+        ./MiniDecaf $cfile >$asmfile
     else
         touch unrecog_impl
     fi
