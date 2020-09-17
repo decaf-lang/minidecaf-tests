@@ -117,7 +117,7 @@ check_env_and_parallel() {
         echo "${EMU%% *} not found"
         exit 1
     fi
-    echo "${EMU%% *} not found"
+    echo "${EMU%% *} found"
 
     if $USE_PARALLEL && parallel --version >/dev/null 2>&1; then
         echo "running tests in parallel"

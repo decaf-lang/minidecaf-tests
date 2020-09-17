@@ -44,9 +44,6 @@ $ git clean -fdx
 $ git checkout -- .
 ```
 
-遇到错误 `ERR`，请检查 `.err` 文件中出错原因是什么（见上面一节）。
-遇到 `FAIL`，请检查 `.actual` 和 `.expected` 文件。
-
 如果参考实现出错，除了下面内容也请阅读参考实现 `README` 的常见问题一节。
 
 * 我做完 step1 为啥不能通过测试？
