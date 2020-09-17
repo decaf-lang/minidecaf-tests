@@ -44,6 +44,11 @@ $ git clean -fdx
 $ git checkout -- .
 ```
 
+遇到错误 `ERR`，请检查 `.err` 文件中出错原因是什么（见上面一节）。
+遇到 `FAIL`，清检查 `.actual` 和 `.expected` 文件。
+
+如果参考实现出错，除了下面内容也请阅读参考实现 `README` 的常见问题一节。
+
 * 我做完 step1 为啥不能通过测试？
   - `STEP_UNTIL=1 ./check.sh`
 * permission denied: ./check.sh
@@ -52,9 +57,10 @@ $ git checkout -- .
   - 请按照[实验指导书](https://decaf-lang.github.io/minidecaf-tutorial/docs/lab0/env.html)配好环境。
     如果你没有安装到系统目录（即 `cp riscv-prebuilt/* /usr/ -r`），你还要设置环境变量。
 * parallel not found
-  - 这意味着你没有安装[GNU parallel](https://www.gnu.org/software/parallel/)，可以通过`apt`或者`brew`等包管理软件来安装。需要注意的是，是否安装了它对测试结果的正确性没有任何影响，所以假如你看到了这条信息，并且测试没有通过，那么不用在它上面找原因。
+  - 这意味着你没有安装[GNU parallel](https://www.gnu.org/software/parallel/)，可以通过`apt`或者`brew`等包管理软件来安装。
+  - 需要注意的是，它只影响运行测试的速度，不影响测试正确性。所以假如你看到了这条信息，并且测试没有通过，那么不用在它上面找原因。
 * Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place
-  - 你是否使用我们支持的语言？如果是，目录结构是否有问题？参见下面【各语言支持】
+  - 你是否使用我们支持的语言？如果是，目录结构是否有问题，还是 `PROJ_PATH` 不对？参见下面【各语言支持】
 * 明明 failcases 的输入有语法错误，为什么我还是生成了汇编？
   - 你是否按照指导书要求，设置了 ANTLR 的 error handler？
 * macOS 下找不到 realpath 命令
