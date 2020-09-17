@@ -60,16 +60,20 @@ run_job() {
         gen_asm $infile $outbase.s &&
         $CC $outbase.s -o $outbase.my ) >$outbase.err 2>&1
     then
-        echo "ERR ${infile}" | tee _cause
-        cat $outbase.err > _diagnostics
+        echo -e "\nERR ${infile}"
+        echo "==== Error information ======================================================="
+        cat $outbase.err
+        echo -e "==============================================================================\n"
         return 2
     fi
     $EMU $outbase.my >/dev/null
     echo $? > $outbase.actual
 
     if ! diff -q $outbase.expected $outbase.actual >/dev/null ; then
-        echo "FAIL ${infile}" | tee _cause
-        diff $outbase.expected $outbase.actual > _diagnostics
+        echo -e "\nFAIL ${infile}"
+        echo "==== Fail information (above: expected, below: actual) ======================="
+        diff $outbase.expected $outbase.actual
+        echo -e "==============================================================================\n"
         return 1
     else
         echo "OK ${infile}"
@@ -89,8 +93,10 @@ run_failjob() {
         gen_asm $infile $outbase.s &&
         $CC $outbase.s -o $outbase.my ) >/dev/null 2>&1
     then
-        echo "FAIL ${infile}" | tee _cause
-        cat $outbase.s > _diagnostics
+        echo -e "\nFAIL ${infile}"
+        echo "==== Fail information (failed to detect input error) ========================="
+        cat $outbase.s
+        echo -e "==============================================================================\n"
         return 1
     else
         echo "OK ${infile}"
@@ -101,39 +107,23 @@ export -f run_failjob
 
 
 check_env_and_parallel() {
-    if $CC --version >/dev/null 2>&1; then
-        echo "gcc found"
-    else
+    if ! $CC --version >/dev/null 2>&1; then
         echo "gcc not found"
         exit 1
     fi
+    echo "gcc found"
 
-    if [ $(uname) = "Linux" ]; then
-        if $QEMU -version >/dev/null 2>&1; then
-            echo "qemu found"
-        else
-            echo "qemu not found"
-            exit 1
-        fi
-    else
-        if $SPIKE -h >/dev/null 2>&1; then
-            echo "spike/pk found"
-        else
-            echo "spike/pk not found"
-            exit 1
-        fi
+    if ! $EMU -h >/dev/null 2>&1; then
+        echo "${EMU%% *} not found"
+        exit 1
     fi
+    echo "${EMU%% *} not found"
 
-    if parallel --version >/dev/null 2>&1; then
-        if $USE_PARALLEL; then
-            echo "parallel found"
-            return 0
-        else
-            echo "parallel found but not used"
-            return 1
-        fi
+    if $USE_PARALLEL && parallel --version >/dev/null 2>&1; then
+        echo "running tests in parallel"
+        return 0
     else
-        echo "parallel not found"
+        echo "running tests serially"
         return 1
     fi
 }
@@ -149,6 +139,7 @@ main() {
     fi
 }
 
+
 cd "$(dirname "$0")"
 
 if ! [[ -d $PROJ_PATH ]]; then
@@ -160,19 +151,6 @@ if ! (main); then
     if [[ -f _unrecog_impl ]]; then
         echo "Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place?"
         rm _unrecog_impl;
-    fi
-
-    if [[ -f _cause ]]; then
-        # only output diagnostics when parallel is disabled
-        # because with parallel running the _cause and _diagnostics
-        # is unprotected and a race could clutter their contents
-        if ! $USE_PARALLEL; then
-            echo ================ `cat _cause` failed
-            echo ================ Diagnostics information:
-            cat _diagnostics
-            echo ================ End diagnostics
-        fi
-        rm _cause _diagnostics
     fi
 
     echo FAILED
