@@ -2,9 +2,10 @@
 MiniDecaf 测例及测试脚本。
 
 我们有两种测例
-- 普通测例（在 `testcases/` 下）：你的 MiniDecaf 要能成功编译这些测例到合法的汇编。
-  我们会将你的编译结果的运行返回值与 GCC 编译结果的运行返回值比较，要求它们必须要完全相同；
-- 报错测例（在 `failcases/` 下）：你的 MiniDecaf 对于这些测例不得生成合法汇编（最好能够生成有用的报错信息）。
+- 普通测例（在 `testcases/` 下）：你的 MiniDecaf 要能成功编译这些测例到合法的汇编，然后正常返回（返回码为 0）。
+  我们会将你的编译结果的运行返回值与 GCC 编译结果的运行返回值比较，要求它们必须要完全相同。
+- 报错测例（在 `failcases/` 下）：你的 MiniDecaf 对于这些测例，要么不能正常返回（返回码非 0），要么不能生成合法汇编（例如输出中夹杂了报错信息）。
+  最好能够生成有用的报错信息，但不要求。
 
 ## 依赖
 - [RISCV工具链](https://decaf-lang.github.io/minidecaf-tutorial-deploy/docs/lab0/riscv.html)
