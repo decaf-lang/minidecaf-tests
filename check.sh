@@ -14,8 +14,8 @@ fi
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
 
-if [[ $STEP_UNTIL == 0 ]]; then
-    echo "STEP_UNTIL=0: no tests run"
+if [[ $STEP_UNTIL < $STEP_FROM ]]; then
+    echo "STEP_UNTIL < STEP_FROM: no tests run"
     exit 0
 elif [[ $STEP_FROM == $STEP_UNTIL ]]; then # fvck bash cause ya can't do `testcases/step{1}/*.c`
     JOBS=($(eval echo testcases/step${STEP_FROM}/*.c))
