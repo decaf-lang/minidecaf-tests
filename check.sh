@@ -9,6 +9,7 @@ else
 fi
 
 : ${USE_PARALLEL:=true}
+: ${STEP_FROM:=1}
 : ${STEP_UNTIL:=12}
 : ${PROJ_PATH:=../minidecaf}
 export PROJ_PATH
@@ -16,12 +17,12 @@ export PROJ_PATH
 if [[ $STEP_UNTIL == 0 ]]; then
     echo "STEP_UNTIL=0: no tests run"
     exit 0
-elif [[ $STEP_UNTIL == 1 ]]; then # fvck bash cause ya can't do `testcases/step{1}/*.c`
-    JOBS=($(eval echo testcases/step1/*.c))
-    FAILJOBS=($(eval echo failcases/step1/*.c))
+elif [[ $STEP_FROM == $STEP_UNTIL ]]; then # fvck bash cause ya can't do `testcases/step{1}/*.c`
+    JOBS=($(eval echo testcases/step${STEP_FROM}/*.c))
+    FAILJOBS=($(eval echo failcases/step${STEP_UNTIL}/*.c))
 else
-    JOBS=($(eval echo testcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
-    FAILJOBS=($(eval echo failcases/step{$(s=(`seq ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
+    JOBS=($(eval echo testcases/step{$(s=(`seq ${STEP_FROM} ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
+    FAILJOBS=($(eval echo failcases/step{$(s=(`seq ${STEP_FROM} ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
 fi
 
 gen_asm() {
