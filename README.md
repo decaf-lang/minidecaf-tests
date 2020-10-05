@@ -22,6 +22,7 @@ $ ./check.sh
 
 | 参数名 | 类型 | 含义 | 默认值 |
 | --- | --- | --- | --- |
+| `STEP_FROM` | 1 到 12 的整数（不超过`STEP_UNTIL`） | 从哪个 step 开始测 | 1 |
 | `STEP_UNTIL` | 1 到 12 的整数 | 测到哪个 step | 12 |
 | `PROJ_PATH` | 一个相对路径 | 你的 minidecaf 相对 minidecaf-tests 的相对路径 | `../minidecaf` |
 
