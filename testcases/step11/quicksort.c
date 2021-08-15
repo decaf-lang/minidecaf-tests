@@ -1,4 +1,7 @@
-int qsort(int *a, int l, int r) {
+int n = 1000000;
+int a[1000000];
+
+int qsort(int l, int r) {
     int i = l;
     int j = r;
     int p = a[(l+r)/2];
@@ -11,43 +14,39 @@ int qsort(int *a, int l, int r) {
         i = i + 1;
         j = j - 1;
     }
-    if (i < r) qsort(a, i, r);
-    if (j > l) qsort(a, l, j);
+    if (i < r) qsort(i, r);
+    if (j > l) qsort(l, j);
 }
 
-int rand(int *state) {
-    *state = ((*state * 214013L + 2531011L) >> 16) & 0x7fff;
-    return *state % 1000;
+int state;
+int rand() {
+    state = ((state * 214013L + 2531011L) >> 16) & 0x7fff;
+    return state % 1000;
 }
 
-int initArr(int n, int *a) {
-    int state = 474230941;
+int initArr(int n) {
     int i = 0;
     while (i < n) {
-        a[i] = rand(&state);
+        a[i] = rand();
         i = i + 1;
     }
 }
 
-int isSorted(int n, int *a) {
+int isSorted(int n) {
     int i = 0;
     while (i < n-1) {
-        if ( *(a+i) > *(a+i+1) )
+        if ( a[i] > a[i+1] )
             return 0;
         i = i + 1;
     }
     return 1;
 }
 
-int n = 1000000;
-int a[1000000];
-
 int main() {
-    int* ap = (int*) a;
-    initArr(n, ap);
-    int sorted_before = isSorted(n, ap);
-    qsort(ap, 0, n-1);
-    int sorted_after = isSorted(n, ap);
+    initArr(n);
+    int sorted_before = isSorted(n);
+    qsort(0, n-1);
+    int sorted_after = isSorted(n);
     if (!(sorted_before==0 && sorted_after==1))
         return 1;
     return 0;
