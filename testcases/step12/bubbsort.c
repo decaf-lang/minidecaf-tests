@@ -1,5 +1,5 @@
 int rand(int *state) {
-    return *state = ((*state * 214013L + 2531011L) >> 16) & 0x7fff;
+    return *state = (*state * 64013 + 1531011) % 32768;
 }
 
 int swap(int *a, int *b) {

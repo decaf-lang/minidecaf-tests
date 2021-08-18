@@ -20,7 +20,7 @@ int qsort(int l, int r) {
 
 int state;
 int rand() {
-    state = ((state * 214013L + 2531011L) >> 16) & 0x7fff;
+    state = (state * 64013 + 1531011) % 32768;
     return state % 1000;
 }
 

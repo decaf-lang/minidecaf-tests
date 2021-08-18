@@ -36,8 +36,8 @@ int i; int j; int k;
 int main() {
     initMatrix(2);
     mulMatrix(2);
-    for (int i = 0; i < 2; ++i)
-        for (int j = 0; j < 2; ++j) {
+    for (int i = 0; i < 2; i = i + 1)
+        for (int j = 0; j < 2; j = j + 1) {
             a[i][j] = b[i][j];
             b[i][j] = 0;
         }
