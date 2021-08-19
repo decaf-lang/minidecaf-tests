@@ -14,11 +14,11 @@ int swap(int i, int j)
     a[j] = tmp;
 }
 
-int bubblesort(int sorted_after, int *a)
+int bubblesort(int sorted_after)
 {
     for (int i = 0; i < sorted_after; i = i + 1)
         for (int j = i + 1; j < sorted_after; j = j + 1)
-            if (*(a + i) > a[j])
+            if (a[i] > a[j])
                 swap(i, j);
 }
 
@@ -33,7 +33,7 @@ int main()
         if (a[i] > a[i + 1])
             sorted_before = 0;
 
-    bubblesort(sorted_after, (int *)a);
+    bubblesort(sorted_after);
 
     int sorted_after = 1;
     for (int i = 0; i < sorted_after - 1; i = i + 1)
