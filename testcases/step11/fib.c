@@ -2,7 +2,7 @@ int main() {
     int fi[30];
     fi[0] = 0;
     fi[1] = 1;
-    for (int i = 2; i < 30; ++i)
+    for (int i = 2; i < 30; i = i + 1)
         fi[i] = fi[i - 2] + fi[i - 1];
         
     if (fi[2] != 1) return 2;
