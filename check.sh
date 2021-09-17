@@ -10,8 +10,8 @@ fi
 
 : ${USE_PARALLEL:=true}
 : ${STEP_FROM:=1}
-: ${STEP_UNTIL:=12}
-: ${PROJ_PATH:=../minidecaf}
+: ${STEP_UNTIL:=11}
+: ${PROJ_PATH:=../python-compiler}
 export PROJ_PATH
 
 if [[ $STEP_UNTIL -lt $STEP_FROM ]]; then
@@ -30,14 +30,8 @@ gen_asm() {
     asmfile=$(realpath "$2")
 
     # 根据特征文件判断 MiniDecaf 类型
-    if [[ -f $PROJ_PATH/minidecaf/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
-        PYTHONPATH=$PROJ_PATH python3 -m minidecaf $cfile >$asmfile
-    elif [[ -f $PROJ_PATH/Cargo.toml ]]; then                     # Rust:   Cargo.toml
-        cargo run --manifest-path $PROJ_PATH/Cargo.toml $cfile >$asmfile
-    elif [[ -f $PROJ_PATH/package.json ]]; then                   # JS/TS:  package.json
-        npm --prefix "$PROJ_PATH" run cli -- "$cfile" -s -o "$asmfile"
-    elif [[ -f $PROJ_PATH/gradlew ]]; then                        # Java:   gradlew
-        java -ea -jar $PROJ_PATH/build/libs/minidecaf.jar $cfile $asmfile
+    if [[ -f $PROJ_PATH/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
+        python3.9 $PROJ_PATH/main.py --input $cfile --riscv >$asmfile
     elif [[ -x $PROJ_PATH/build/MiniDecaf ]]; then                # Others: use the executable
         $PROJ_PATH/build/MiniDecaf $cfile >$asmfile
     else
@@ -131,12 +125,13 @@ check_env_and_parallel() {
 
 
 main() {
+    echo ${#JOBS[@]}
     if check_env_and_parallel; then
-        parallel --halt now,fail=1 run_job ::: ${JOBS[@]} || exit 1
-        parallel --halt now,fail=1 run_failjob ::: ${FAILJOBS[@]} || exit 1
+        parallel run_job ::: ${JOBS[@]}
+        parallel run_failjob ::: ${FAILJOBS[@]}
     else
-        for job in ${JOBS[@]}; do run_job $job || exit 1; done
-        for job in ${FAILJOBS[@]}; do run_failjob $job || exit 1; done
+        for job in ${JOBS[@]}; do run_job $job; done
+        for job in ${FAILJOBS[@]}; do run_failjob $job; done
     fi
 }
 
