@@ -32,8 +32,8 @@ gen_asm() {
     # 根据特征文件判断 MiniDecaf 类型
     if [[ -f $PROJ_PATH/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
         python3.9 $PROJ_PATH/main.py --input $cfile --riscv >$asmfile
-    elif [[ -x $PROJ_PATH/build/MiniDecaf ]]; then                # Others: use the executable
-        $PROJ_PATH/build/MiniDecaf $cfile >$asmfile
+    elif [[ -f $PROJ_PATH/src/mind ]]; then             # C++: use the executable
+        $PROJ_PATH/src/mind -l 5 -m riscv $cfile >$asmfile
     else
         touch _unrecog_impl
     fi
