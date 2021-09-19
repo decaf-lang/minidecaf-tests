@@ -11,8 +11,36 @@ fi
 : ${USE_PARALLEL:=true}
 : ${STEP_FROM:=1}
 : ${STEP_UNTIL:=11}
-: ${PROJ_PATH:=../python-compiler}
+: ${PROJ_PATH:=..}
 export PROJ_PATH
+
+: ${USE_PARALLEL:=true}
+: ${PROJ_PATH:=..}
+
+if [[ $CI_COMMIT_REF_NAME = "stage-1" ]]; then
+    : ${STEP_FROM:=1}
+    : ${STEP_UNTIL:=4}
+elif [[ $CI_COMMIT_REF_NAME = "stage-2" ]]; then
+    : ${STEP_FROM:=5}
+    : ${STEP_UNTIL:=6}
+elif [[ $CI_COMMIT_REF_NAME = "stage-3" ]]; then
+    : ${STEP_FROM:=7}
+    : ${STEP_UNTIL:=8}
+elif [[ $CI_COMMIT_REF_NAME = "stage-4" ]]; then
+    : ${STEP_FROM:=9}
+    : ${STEP_UNTIL:=10}
+elif [[ $CI_COMMIT_REF_NAME = "stage-5" ]]; then
+    : ${STEP_FROM:=11}
+    : ${STEP_UNTIL:=11}
+elif [[ $CI_COMMIT_REF_NAME = "parser-stage" ]]; then
+    : ${STEP_FROM:=1}
+    : ${STEP_UNTIL:=6}
+else
+    echo "Warning: unknown branch"
+    echo "All testcases are taken into account."
+    : ${STEP_FROM:=1}
+    : ${STEP_UNTIL:=11}
+fi
 
 if [[ $STEP_UNTIL -lt $STEP_FROM ]]; then
     echo "STEP_UNTIL < STEP_FROM: no tests run"
@@ -125,7 +153,7 @@ check_env_and_parallel() {
 
 
 main() {
-    echo ${#JOBS[@]}
+    echo "${#JOBS[@]} cases in total"
     if check_env_and_parallel; then
         parallel run_job ::: ${JOBS[@]}
         parallel run_failjob ::: ${FAILJOBS[@]}
@@ -152,5 +180,3 @@ if ! (main); then
     echo FAILED
     exit 1;
 fi
-
-echo PASSED
