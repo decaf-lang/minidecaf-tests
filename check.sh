@@ -68,6 +68,10 @@ gen_asm() {
 }
 export -f gen_asm
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
 
 run_job() {
     infile=$1
@@ -83,7 +87,7 @@ run_job() {
         gen_asm $infile $outbase.s &&
         $CC $outbase.s -o $outbase.my ) >$outbase.err 2>&1
     then
-        echo -e "\nERR ${infile}"
+        echo -e "\n${YELLOW}ERR${NC} ${infile}"
         echo "==== Error information ======================================================="
         cat $outbase.err
         echo -e "==============================================================================\n"
@@ -93,13 +97,13 @@ run_job() {
     echo $? > $outbase.actual
 
     if ! diff -q $outbase.expected $outbase.actual >/dev/null ; then
-        echo -e "\nFAIL ${infile}"
+        echo -e "\n${RED}FAIL ${infile}"
         echo "==== Fail information (above: expected, below: actual) ======================="
         diff $outbase.expected $outbase.actual
         echo -e "==============================================================================\n"
         return 1
     else
-        echo "OK ${infile}"
+        echo -e "${GREEN}OK${NC} ${infile}"
         return 0
     fi
 }
@@ -116,13 +120,13 @@ run_failjob() {
         gen_asm $infile $outbase.s &&
         $CC $outbase.s -o $outbase.my ) >/dev/null 2>&1
     then
-        echo -e "\nFAIL ${infile}"
+        echo -e "\n${RED}FAIL${NC} ${infile}"
         echo "==== Fail information (failed to detect input error) ========================="
         cat $outbase.s
         echo -e "==============================================================================\n"
         return 1
     else
-        echo "OK ${infile}"
+        echo -e "${GREEN}OK${NC} ${infile}"
         return 0
     fi
 }
