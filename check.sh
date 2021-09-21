@@ -9,8 +9,6 @@ else
 fi
 
 : ${USE_PARALLEL:=true}
-: ${STEP_FROM:=1}
-: ${STEP_UNTIL:=11}
 : ${PROJ_PATH:=..}
 export PROJ_PATH
 
