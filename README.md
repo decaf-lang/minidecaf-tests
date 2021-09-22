@@ -24,7 +24,7 @@ $ ./check.sh
 | --- | --- | --- | --- |
 | `STEP_FROM` | 1 到 12 的整数（不超过`STEP_UNTIL`） | 从哪个 step 开始测 | 1 |
 | `STEP_UNTIL` | 1 到 12 的整数 | 测到哪个 step | 12 |
-| `PROJ_PATH` | 一个相对路径 | 你的 minidecaf 相对 minidecaf-tests 的相对路径 | `../minidecaf` |
+| `PROJ_PATH` | 一个路径 | 你的 minidecaf 仓库的路径 | `..` |
 
 ## 输出含义
 * `OK` 测试点通过
@@ -45,19 +45,12 @@ $ git clean -fdx
 $ git checkout -- .
 ```
 
-如果参考实现出错，除了下面内容也请阅读参考实现 `README` 的常见问题一节。
+如果出错，除了下面内容也请阅读实验指导书的[常见问题](https://decaf-lang.github.io/minidecaf-tutorial/docs/step0/faq.html)一节。
 
-* 我做完 step1 为啥不能通过测试？
-  - `STEP_UNTIL=1 ./check.sh`
 * permission denied: ./check.sh
   - 需要给 `check.sh` 加执行权限 `chmod +x check.sh`
 * gcc not found 或 qemu not found
   - 请按照[实验指导书](https://decaf-lang.github.io/minidecaf-tutorial/docs/lab0/env.html)配好环境。
-    如果你没有安装到系统目录（即 `cp riscv-prebuilt/* /usr/ -r`），你还要设置环境变量。
-* Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place
-  - 你是否使用我们支持的语言？如果是，目录结构是否有问题，还是 `PROJ_PATH` 不对？参见下面【各语言支持】
-* 明明 failcases 的输入有语法错误，为什么我还是生成了汇编？
-  - 你是否按照指导书要求，设置了 ANTLR 的 error handler？
 * macOS 下找不到 realpath 命令
   ```
   ./check.sh: line 25: realpath: command not found
@@ -65,20 +58,6 @@ $ git checkout -- .
   ./check.sh: line 30: $asmfile: ambiguous redirect
   ```
   - 使用 Homebrew 安装 coreutils：`brew install coreutils`
-
-## 各语言支持
-为了通过自动测试，我们对你的编译器做以下约定。
-`PROJ_PATH` 含义同上。
-
-| 用于实现 MiniDecaf 编译器的语言 | 约定 |
-| --- | --- |
-| python | `PROJ_PATH/minidecaf` 是一个可执行模块（有 `PROJ_PATH/minidecaf/__main__.py` 和 `PROJ_PATH/minidecaf/requirements.txt`） |
-| rust | 使用 cargo 管理依赖，`PROJ_PATH/Cargo.toml` 存在 |
-| javascript | 使用 npm 管理依赖，`PROJ_PATH/package.json` 存在 |
-| java | 使用 gradle 管理依赖，`PROJ_PATH/gradlew` 存在 |
-| C/C++/其他 | 自行在仓库中和 `prepare.sh` 中管理依赖，要求执行 `prepare.sh` 后有 `PROJ_PATH/build/MiniDecaf` 可执行程序 |
-
-各语言用法参见 `check.sh` 中 `gen_asm` 函数。
 
 ## 参考
 * [Nora Sandler's compiler testsuits](https://github.com/nlsandler/write_a_c_compiler)
