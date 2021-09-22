@@ -43,19 +43,27 @@ fi
 if [[ $STEP_UNTIL -lt $STEP_FROM ]]; then
     echo "STEP_UNTIL < STEP_FROM: no tests run"
     exit 0
-elif [[ $STEP_FROM == $STEP_UNTIL ]]; then # fvck bash cause ya can't do `testcases/step{1}/*.c`
-    JOBS=($(eval echo testcases/step${STEP_FROM}/*.c))
-    FAILJOBS=($(eval echo failcases/step${STEP_UNTIL}/*.c))
 else
-    JOBS=($(eval echo testcases/step{$(s=(`seq ${STEP_FROM} ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
-    FAILJOBS=($(eval echo failcases/step{$(s=(`seq ${STEP_FROM} ${STEP_UNTIL}`); IFS=, ; echo "${s[*]}")}/*.c))
+    JOBS=()
+    for step in `seq ${STEP_FROM} ${STEP_UNTIL}`; do
+        if [ -d "testcases/step${step}" ]; then
+            JOBS+=($(eval echo testcases/step${step}/*.c))
+        fi
+    done
+
+    FAILJOBS=()
+    for step in `seq ${STEP_FROM} ${STEP_UNTIL}`; do
+        if [ -d "failcases/step${step}" ]; then
+            FAILJOBS+=($(eval echo failcases/step${step}/*.c))
+        fi
+    done
 fi
 
 gen_asm() {
     cfile=$(realpath "$1")
     asmfile=$(realpath "$2")
 
-    # 根据特征文件判断 MiniDecaf 类型
+    # 根据特征文件判断所使用的语言
     if [[ -f $PROJ_PATH/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
         python3.9 $PROJ_PATH/main.py --input $cfile --riscv >$asmfile
     elif [[ -f $PROJ_PATH/src/mind ]]; then             # C++: use the executable
