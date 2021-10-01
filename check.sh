@@ -12,9 +12,6 @@ fi
 : ${PROJ_PATH:=..}
 export PROJ_PATH
 
-: ${USE_PARALLEL:=true}
-: ${PROJ_PATH:=..}
-
 if [[ $CI_COMMIT_REF_NAME == "stage-1" ]]; then
     : ${STEP_FROM:=1}
     : ${STEP_UNTIL:=4}
@@ -30,9 +27,11 @@ elif [[ $CI_COMMIT_REF_NAME == "stage-4" ]]; then
 elif [[ $CI_COMMIT_REF_NAME == "stage-5" ]]; then
     : ${STEP_FROM:=11}
     : ${STEP_UNTIL:=11}
-elif [[ $CI_COMMIT_REF_NAME == "parser-stage" ]]; then
+elif [ -v $CI_COMMIT_REF_NAME ]; then
+    echo "The test is not in CI."
+    echo "All testcases are taken into account."
     : ${STEP_FROM:=1}
-    : ${STEP_UNTIL:=6}
+    : ${STEP_UNTIL:=11}
 else
     echo "Warning: unknown branch"
     echo "All testcases are taken into account."
