@@ -8,7 +8,7 @@ else
     export EMU=$SPIKE
 fi
 
-: ${USE_PARALLEL:=false}
+: ${USE_PARALLEL:=true}
 : ${PROJ_PATH:=..}
 export PROJ_PATH
 
