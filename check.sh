@@ -121,9 +121,7 @@ run_failjob() {
 
     rm $outbase.{my,s} 1>/dev/null 2>&1
 
-    if (
-        gen_asm $infile $outbase.s &&
-        $CC $outbase.s -o $outbase.my ) >/dev/null 2>&1
+    if (gen_asm $infile $outbase.s) >/dev/null 2>&1
     then
         echo -e "\n${RED}FAIL${NC} ${infile}"
         echo "==== Fail information (failed to detect input error) ========================="
@@ -162,7 +160,8 @@ check_env_and_parallel() {
 
 
 main() {
-    echo "${#JOBS[@]} cases in total"
+    JOB_CNT=$((${#JOBS[@]} + ${#FAILJOBS[@]}))
+    echo "$JOB_CNT cases in total"
     if check_env_and_parallel; then
         parallel run_job ::: ${JOBS[@]}
         parallel run_failjob ::: ${FAILJOBS[@]}
