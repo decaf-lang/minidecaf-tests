@@ -169,12 +169,14 @@ main() {
     else
         error_count=0
         for job in ${JOBS[@]}; do
-            error_count=$(($error_count + $(run_job $job)))
+            run_job $job
+            error_count=$(($error_count + $?))
         done
         for job in ${FAILJOBS[@]}; do
-            error_count=$(($error_count + $(run_failjob $job)))
+            run_failjob $job
+            error_count=$(($error_count + $?))
         done
-        return error_count
+        return $error_count
     fi
 }
 
