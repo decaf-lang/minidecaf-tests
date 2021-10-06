@@ -102,7 +102,7 @@ run_job() {
     echo $? > $outbase.actual
 
     if ! diff -q $outbase.expected $outbase.actual >/dev/null ; then
-        echo -e "\n${RED}FAIL ${infile}"
+        echo -e "\n${RED}FAIL${NC} ${infile}"
         echo "==== Fail information (above: expected, below: actual) ======================="
         diff $outbase.expected $outbase.actual
         echo -e "==============================================================================\n"
