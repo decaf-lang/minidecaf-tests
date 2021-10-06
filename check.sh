@@ -163,11 +163,9 @@ main() {
     JOB_CNT=$((${#JOBS[@]} + ${#FAILJOBS[@]}))
     echo "$JOB_CNT cases in total"
     if check_env_and_parallel; then
-        parallel run_job ::: ${JOBS[@]}
-        parallel run_failjob ::: ${FAILJOBS[@]}
+        parallel run_job ::: ${JOBS[@]} && parallel run_failjob ::: ${FAILJOBS[@]}
     else
-        for job in ${JOBS[@]}; do run_job $job; done
-        for job in ${FAILJOBS[@]}; do run_failjob $job; done
+        for job in ${JOBS[@]}; do run_job $job; done && for job in ${FAILJOBS[@]}; do run_failjob $job; done
     fi
 }
 
