@@ -12,9 +12,6 @@ fi
 : ${PROJ_PATH:=..}
 export PROJ_PATH
 
-: ${USE_PARALLEL:=true}
-: ${PROJ_PATH:=..}
-
 if [[ $CI_COMMIT_REF_NAME == "stage-1" ]]; then
     : ${STEP_FROM:=1}
     : ${STEP_UNTIL:=4}
@@ -30,9 +27,11 @@ elif [[ $CI_COMMIT_REF_NAME == "stage-4" ]]; then
 elif [[ $CI_COMMIT_REF_NAME == "stage-5" ]]; then
     : ${STEP_FROM:=11}
     : ${STEP_UNTIL:=11}
-elif [[ $CI_COMMIT_REF_NAME == "parser-stage" ]]; then
+elif [ -v $CI_COMMIT_REF_NAME ]; then
+    echo "The test is not in CI."
+    echo "All testcases are taken into account."
     : ${STEP_FROM:=1}
-    : ${STEP_UNTIL:=6}
+    : ${STEP_UNTIL:=11}
 else
     echo "Warning: unknown branch"
     echo "All testcases are taken into account."
@@ -103,7 +102,7 @@ run_job() {
     echo $? > $outbase.actual
 
     if ! diff -q $outbase.expected $outbase.actual >/dev/null ; then
-        echo -e "\n${RED}FAIL ${infile}"
+        echo -e "\n${RED}FAIL${NC} ${infile}"
         echo "==== Fail information (above: expected, below: actual) ======================="
         diff $outbase.expected $outbase.actual
         echo -e "==============================================================================\n"
@@ -122,9 +121,8 @@ run_failjob() {
 
     rm $outbase.{my,s} 1>/dev/null 2>&1
 
-    if (
-        gen_asm $infile $outbase.s &&
-        $CC $outbase.s -o $outbase.my ) >/dev/null 2>&1
+    if (gen_asm $infile $outbase.s &&
+        $CC $outbase.s -o $outbase.my) >/dev/null 2>&1
     then
         echo -e "\n${RED}FAIL${NC} ${infile}"
         echo "==== Fail information (failed to detect input error) ========================="
@@ -163,13 +161,22 @@ check_env_and_parallel() {
 
 
 main() {
-    echo "${#JOBS[@]} cases in total"
+    JOB_CNT=$((${#JOBS[@]} + ${#FAILJOBS[@]}))
+    echo "$JOB_CNT cases in total"
     if check_env_and_parallel; then
         parallel run_job ::: ${JOBS[@]}
         parallel run_failjob ::: ${FAILJOBS[@]}
     else
-        for job in ${JOBS[@]}; do run_job $job; done
-        for job in ${FAILJOBS[@]}; do run_failjob $job; done
+        error_count=0
+        for job in ${JOBS[@]}; do
+            run_job $job
+            error_count=$(($error_count + $?))
+        done
+        for job in ${FAILJOBS[@]}; do
+            run_failjob $job
+            error_count=$(($error_count + $?))
+        done
+        return $error_count
     fi
 }
 
