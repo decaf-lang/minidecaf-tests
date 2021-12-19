@@ -29,12 +29,12 @@ elif [[ $CI_COMMIT_REF_NAME == "stage-5" ]]; then
     : ${STEP_UNTIL:=11}
 elif [ -v $CI_COMMIT_REF_NAME ]; then
     echo "The test is not in CI."
-    echo "All testcases are taken into account."
+    echo "All testcases are taken into account, unless you manually set STEP_FROM and STEP_UNTIL."
     : ${STEP_FROM:=1}
     : ${STEP_UNTIL:=11}
 else
     echo "Warning: unknown branch"
-    echo "All testcases are taken into account."
+    echo "All testcases are taken into account, unless you manually set STEP_FROM and STEP_UNTIL."
     : ${STEP_FROM:=1}
     : ${STEP_UNTIL:=11}
 fi
