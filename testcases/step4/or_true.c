@@ -1,3 +1,3 @@
 int main() {
-    return 100 || 0;
+    return 1 || 0;
 }
