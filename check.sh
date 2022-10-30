@@ -27,6 +27,9 @@ elif [[ $CI_COMMIT_REF_NAME == "stage-4" ]]; then
 elif [[ $CI_COMMIT_REF_NAME == "stage-5" ]]; then
     : ${STEP_FROM:=11}
     : ${STEP_UNTIL:=11}
+elif [[ $CI_COMMIT_REF_NAME == "parser-stage" ]]; then
+    : ${STEP_FROM:=1}
+    : ${STEP_UNTIL:=6}
 elif [ -v $CI_COMMIT_REF_NAME ]; then
     echo "The test is not in CI."
     echo "All testcases are taken into account, unless you manually set STEP_FROM and STEP_UNTIL."
@@ -56,6 +59,8 @@ else
             FAILJOBS+=($(eval echo failcases/step${step}/*.c))
         fi
     done
+
+    job_cnt=$((${#JOBS[@]} + ${#FAILJOBS[@]}))
 fi
 
 gen_asm() {
@@ -63,10 +68,11 @@ gen_asm() {
     asmfile=$(realpath "$2")
 
     # 根据特征文件判断所使用的语言
+    rm -f _unrecog_impl
     if [[ -f $PROJ_PATH/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
-        python3.9 $PROJ_PATH/main.py --input $cfile --riscv >$asmfile
+        python3.9 $PROJ_PATH/main.py --input "$cfile" --riscv >"$asmfile"
     elif [[ -f $PROJ_PATH/src/mind ]]; then             # C++: use the executable
-        $PROJ_PATH/src/mind -l 5 -m riscv $cfile >$asmfile
+        $PROJ_PATH/src/mind -l 5 -m riscv "$cfile" >"$asmfile"
     else
         touch _unrecog_impl
     fi
@@ -161,25 +167,49 @@ check_env_and_parallel() {
 
 
 main() {
-    JOB_CNT=$((${#JOBS[@]} + ${#FAILJOBS[@]}))
-    echo "$JOB_CNT cases in total"
+    echo "$job_cnt cases in total"
+
+    err_cnt=0
     if check_env_and_parallel; then
-        parallel run_job ::: ${JOBS[@]}
-        parallel run_failjob ::: ${FAILJOBS[@]}
+        # save logs in file and read logs later
+        parallel --joblog /tmp/test.log run_job ::: ${JOBS[@]}
+        parallel --joblog /tmp/fail.log run_failjob ::: ${FAILJOBS[@]}
+
+        err_cnt=$(($err_cnt + $(cat /tmp/test.log | awk '{if ($7 != 0) {x += 1}} END { print x - 1 }')))
+        err_cnt=$(($err_cnt + $(cat /tmp/fail.log | awk '{if ($7 != 0) {x += 1}} END { print x - 1 }')))
     else
-        error_count=0
         for job in ${JOBS[@]}; do
             run_job $job
-            error_count=$(($error_count + $?))
+            if [[ $? -ne 0 ]]; then
+                err_cnt=$(($err_cnt + 1))
+            fi
         done
         for job in ${FAILJOBS[@]}; do
             run_failjob $job
-            error_count=$(($error_count + $?))
+            if [[ $? -ne 0 ]]; then
+                err_cnt=$(($err_cnt + 1))
+            fi
         done
-        return $error_count
     fi
+    echo -e "Pass $(($job_cnt - $err_cnt)) / $job_cnt cases in total.\n"
+    return $err_cnt
 }
 
+# check if the report exists
+check_report() {
+    if [ ! -v $CI_COMMIT_REF_NAME ] &&
+        [[ $CI_COMMIT_REF_NAME =~ ^(stage-1|stage-2|stage-3|stage-4|stage-5|parser-stage)$ ]]; then
+        if [[ ! -f $PROJ_PATH/reports/$CI_COMMIT_REF_NAME.pdf ]]; then
+            echo -e "${RED}ERROR: There's no reports/$CI_COMMIT_REF_NAME.pdf${NC}"
+            return 1
+        else
+            echo -e "${GREEN}SUCCESS: The report is submitted.${NC}"
+            return 0
+        fi
+    else
+        return 0
+    fi
+}
 
 cd "$(dirname "$0")"
 
@@ -188,7 +218,9 @@ if ! [[ -d $PROJ_PATH ]]; then
     exit 1
 fi
 
-if ! (main); then
+main; ec1=$?
+check_report; ec2=$?
+if [[ $(($ec1 + $ec2)) -ne 0 ]]; then
     if [[ -f _unrecog_impl ]]; then
         echo "Unrecognized implementation. Are you using one of the supported language & frameworks? Or did you put check.sh in the wrong place?"
         rm _unrecog_impl;
