@@ -1,5 +1,5 @@
 #!/bin/bash
-export CC="riscv64-unknown-elf-gcc -std=c17 -march=rv32im -mabi=ilp32"
+export CC="riscv64-unknown-elf-gcc -std=c17 -march=rv32im -mabi=ilp32 runtime.c runtime.s"
 export QEMU=qemu-riscv32
 export SPIKE="spike --isa=RV32G /usr/local/bin/pk"
 if [ $(uname) = "Linux" ]; then

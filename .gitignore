@@ -8,3 +8,5 @@
 *.err
 no_compiler_set
 .vscode/
+
+!runtime.s
