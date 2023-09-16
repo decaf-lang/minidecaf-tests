@@ -1,5 +1,5 @@
 int main() {
-  do {
+  while (a) {
     int a = 0;
-  } while (a);
+  }
 }
