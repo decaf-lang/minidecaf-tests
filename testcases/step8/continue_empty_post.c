@@ -1,6 +1,6 @@
 int main() {
     int sum = 0;
-    for (int i = 0; i < 10;) {
+    for (int i = 0; i < 10; i) {
         i = i + 1;
         if (i % 2)
             continue;

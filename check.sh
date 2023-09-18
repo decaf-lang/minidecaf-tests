@@ -70,7 +70,7 @@ gen_asm() {
     # 根据特征文件判断所使用的语言
     rm -f _unrecog_impl
     if [[ -f $PROJ_PATH/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
-        python3.9 $PROJ_PATH/main.py --input "$cfile" --riscv >"$asmfile"
+        python $PROJ_PATH/main.py --input "$cfile" --riscv >"$asmfile"
     elif [[ -f $PROJ_PATH/src/mind ]]; then             # C++: use the executable
         $PROJ_PATH/src/mind -l 5 -m riscv "$cfile" >"$asmfile"
     else
