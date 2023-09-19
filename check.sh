@@ -1,5 +1,5 @@
 #!/bin/bash
-export CC="riscv64-unknown-elf-gcc -std=c17 -march=rv32im -mabi=ilp32 runtime.c runtime.s"
+export CC="riscv64-unknown-elf-gcc -std=c17 -march=rv32im -mabi=ilp32"
 export QEMU=qemu-riscv32
 export SPIKE="spike --isa=RV32G /usr/local/bin/pk"
 if [ $(uname) = "Linux" ]; then
@@ -17,29 +17,29 @@ if [[ $CI_COMMIT_REF_NAME == "stage-1" ]]; then
     : ${STEP_UNTIL:=4}
 elif [[ $CI_COMMIT_REF_NAME == "stage-2" ]]; then
     : ${STEP_FROM:=5}
-    : ${STEP_UNTIL:=6}
+    : ${STEP_UNTIL:=5}
 elif [[ $CI_COMMIT_REF_NAME == "stage-3" ]]; then
+    : ${STEP_FROM:=6}
+    : ${STEP_UNTIL:=6}
+elif [[ $CI_COMMIT_REF_NAME == "stage-4" ]]; then
     : ${STEP_FROM:=7}
     : ${STEP_UNTIL:=8}
-elif [[ $CI_COMMIT_REF_NAME == "stage-4" ]]; then
-    : ${STEP_FROM:=9}
-    : ${STEP_UNTIL:=10}
 elif [[ $CI_COMMIT_REF_NAME == "stage-5" ]]; then
-    : ${STEP_FROM:=11}
-    : ${STEP_UNTIL:=11}
-elif [[ $CI_COMMIT_REF_NAME == "parser-stage" ]]; then
-    : ${STEP_FROM:=1}
-    : ${STEP_UNTIL:=6}
+    : ${STEP_FROM:=9}
+    : ${STEP_UNTIL:=9}
+elif [[ $CI_COMMIT_REF_NAME == "stage-6" ]]; then
+    : ${STEP_FROM:=10}
+    : ${STEP_UNTIL:=12}
 elif [ -v $CI_COMMIT_REF_NAME ]; then
     echo "The test is not in CI."
     echo "All testcases are taken into account, unless you manually set STEP_FROM and STEP_UNTIL."
     : ${STEP_FROM:=1}
-    : ${STEP_UNTIL:=11}
+    : ${STEP_UNTIL:=12}
 else
     echo "Warning: unknown branch"
     echo "All testcases are taken into account, unless you manually set STEP_FROM and STEP_UNTIL."
     : ${STEP_FROM:=1}
-    : ${STEP_UNTIL:=11}
+    : ${STEP_UNTIL:=12}
 fi
 
 if [[ $STEP_UNTIL -lt $STEP_FROM ]]; then
@@ -71,8 +71,6 @@ gen_asm() {
     rm -f _unrecog_impl
     if [[ -f $PROJ_PATH/requirements.txt ]]; then       # Python: minidecaf/requirements.txt
         python $PROJ_PATH/main.py --input "$cfile" --riscv >"$asmfile"
-    elif [[ -f $PROJ_PATH/src/mind ]]; then             # C++: use the executable
-        $PROJ_PATH/src/mind -l 5 -m riscv "$cfile" >"$asmfile"
     else
         touch _unrecog_impl
     fi

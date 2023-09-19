@@ -12,6 +12,7 @@ int swap(int i, int j)
     int tmp = a[i];
     a[i] = a[j];
     a[j] = tmp;
+    return 0;
 }
 
 int bubblesort(int sorted_after)
@@ -20,6 +21,7 @@ int bubblesort(int sorted_after)
         for (int j = i + 1; j < sorted_after; j = j + 1)
             if (a[i] > a[j])
                 swap(i, j);
+    return 0;
 }
 
 int main()

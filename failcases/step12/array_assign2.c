@@ -1,6 +1,9 @@
+int fun(int a){
+  return a;
+}
+
 int main(){
   int b[10] = {};
-  int c;
-  c = b;
+  fun(b);
   return b[0];
 }

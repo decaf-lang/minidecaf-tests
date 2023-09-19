@@ -1,7 +1,7 @@
 int a[2][2]; int b[2][2];
 
 int mulMatrix(int n) {
-int i; int j; int k;
+    int i; int j; int k;
     i = 0;
     while (i < n) {
         j = 0;
@@ -16,10 +16,11 @@ int i; int j; int k;
         }
         i = i + 1;
     }
+    return 0;
 }
 
 int initMatrix(int n) {
-int i; int j; int k;
+    int i; int j; int k;
     k = 0;
     i = 0;
     while (i < 2) {
@@ -31,6 +32,7 @@ int i; int j; int k;
         }
         i = i + 1;
     }
+    return 0;
 }
 
 int main() {

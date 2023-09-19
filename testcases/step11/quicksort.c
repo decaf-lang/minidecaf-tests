@@ -16,6 +16,7 @@ int qsort(int l, int r) {
     }
     if (i < r) qsort(i, r);
     if (j > l) qsort(l, j);
+    return 0;
 }
 
 int state;
@@ -30,6 +31,7 @@ int initArr(int n) {
         a[i] = rand();
         i = i + 1;
     }
+    return 0;
 }
 
 int isSorted(int n) {

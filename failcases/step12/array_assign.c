@@ -1,6 +1,5 @@
 int main(){
   int b[10] = {};
-  int c;
-  c = b;
+  b = 10;
   return b[0];
 }
